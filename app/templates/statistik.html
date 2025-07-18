@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <title>Veckostatistik</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="/static/style.css">
+ <link rel="manifest" href="/static/manifest.json">
+</head>
+<body>
+  <h2>📊 Medicinintag – senaste 7 dagar</h2>
+  <canvas id="myChart"></canvas>
+
+  <div class="links">
+    <a href="/">⬅ Tillbaka</a>
+    <button onclick="toggleDarkMode()">🌓 Växla tema</button>
+  </div>
+
+  <script>
+    const ctx = document.getElementById('myChart');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: {{ data.keys() | list | tojson }},
+        datasets: [{
+          label: 'Antal intag',
+          data: {{ data.values() | list | tojson }},
+          backgroundColor: 'rgba(75, 192, 192, 0.5)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { precision: 0 }
+          }
+        }
+      }
+    });
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+    }
+    if (localStorage.getItem("darkMode") === "true") {
+      document.body.classList.add("dark");
+    }
+  </script>
+</body>
+</html>

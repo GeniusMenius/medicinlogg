@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <title>Medicinschema</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="manifest" href="/static/manifest.json">
+</head>
+<body>
+  <h2>💊 Medicinschema – bocka i dagens intag</h2>
+
+  <form method="POST">
+    {% for med in mediciner %}
+      {% set klass = "" %}
+      {% if senaste[med.namn] %}
+        {% set timmar = ((datetime.now() - senaste[med.namn]).total_seconds() / 3600)|round(1) %}
+        {% if med.namn == "Lamotrigin" and timmar > 24 %}
+          {% set klass = "alert" %}
+        {% elif med.namn != "Lamotrigin" and timmar > med.gräns_i_timmar %}
+          {% set klass = "warning" %}
+        {% endif %}
+      {% else %}
+        {% set timmar = None %}
+      {% endif %}
+
+      <div class="medicin {{ klass }} {{ med.färgklass }}">
+        <input type="checkbox" id="{{ med.namn }}" name="{{ med.namn }}">
+        <label for="{{ med.namn }}">{{ med.namn }}</label>
+       <div class="timestamp">
+  {% if timmar is not none %}
+    {% if timmar < 1 %}
+      {% set minuter = ((datetime.now() - senaste[med.namn]).total_seconds() / 60)|round(0) %}
+      Togs för {{ minuter }} minuter sedan
+    {% else %}
+      {% set timmar_heltal = timmar|int %}
+      {% set minuter = ((timmar - timmar_heltal) * 60)|round(0) %}
+      Togs för {{ timmar_heltal }} timmar{% if minuter > 0 %} och {{ minuter }} minuter{% endif %} sedan
+    {% endif %}
+  {% else %}
+    🔴 Ej registrerat intag
+  {% endif %}
+</div>
+
+        </div>
+      </div>
+    {% endfor %}
+    <button type="submit">✔ Skicka in</button>
+  </form>
+
+  <div class="links">
+    <a href="/logg">📜 Visa logg</a>
+    <a href="/statistik">📊 Veckostatistik</a>
+    <a href="/rensa_senaste">🧹 Rensa senaste intaget</a>
+    <a href="/inställningar">⚙️ Inställningar</a>
+    <button onclick="toggleDarkMode()">🌓 Växla tema</button>
+  </div>
+
+  <script>
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+    }
+    if (localStorage.getItem("darkMode") === "true") {
+      document.body.classList.add("dark");
+    }
+  </script>
+</body>
+</html>
