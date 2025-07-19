@@ -12,6 +12,7 @@
   </form>
   <hr>
 
+  <!-- ➕ Lägg till ny medicin -->
   <form method="POST">
     <input type="text" name="namn" placeholder="Medicinnamn" required>
     <input type="number" name="gräns" placeholder="Gräns i timmar">
@@ -26,11 +27,16 @@
       <input type="checkbox" name="visa_nästa_dos" checked>
       Visa nästa dosindikator
     </label>
+    <label>
+      <input type="checkbox" name="vid_behov">
+      💤 Vid behov
+    </label>
     <button type="submit">➕ Lägg till</button>
   </form>
 
+  <!-- 📋 Redigera befintliga mediciner -->
   <table>
-    <tr><th>Namn</th><th>Gräns</th><th>Färg</th><th>DOS</th><th>🛠</th><th>🗑</th></tr>
+    <tr><th>Namn</th><th>Gräns</th><th>Färg</th><th>DOS</th><th>Vid behov</th><th>🛠</th><th>🗑</th></tr>
     {% for med in mediciner %}
     <tr>
       <form method="POST">
@@ -52,9 +58,16 @@
             🕒
           </label>
         </td>
+        <td>
+          <label>
+            <input type="checkbox" name="vid_behov" {% if med.gräns_i_timmar == 0 %}checked{% endif %}>
+            💤
+          </label>
+        </td>
         <td><button type="submit">💾 Spara</button></td>
       </form>
 
+      <!-- 🗑 Radera medicin -->
       <form method="POST">
         <input type="hidden" name="radera_id" value="{{ med.id }}">
         <td><button type="submit" onclick="return confirm('Ta bort {{ med.namn }}?')">🗑️</button></td>

@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
-
 from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta
 from collections import defaultdict
 import os
 
-# 🚀 Skapa Flask-appen och konfigurera databasen
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///mediciner.db"
 db = SQLAlchemy(app)
 
-# 💊 Tabell: Medicin
+# 💊 Tabeller
 class Medicin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     namn = db.Column(db.String(100), unique=True, nullable=False)
@@ -19,18 +17,16 @@ class Medicin(db.Model):
     färgklass = db.Column(db.String(20), default="standard")
     visa_nästa_dos = db.Column(db.Boolean, default=True)
 
-# 🕒 Tabell: Intag
 class Intag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     namn = db.Column(db.String(100))
     tidpunkt = db.Column(db.DateTime, default=datetime.now)
 
-# 👤 Tabell: Profil
 class Profil(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     namn = db.Column(db.String(100), nullable=False)
 
-# 📦 Initiera databasen vid första körning
+# 📦 Initiera databasen
 with app.app_context():
     if not os.path.exists("mediciner.db"):
         db.create_all()
@@ -50,6 +46,7 @@ def statistik():
     intervall = request.args.get("intervall", "vecka")
     diagramtyp = request.args.get("diagramtyp", "bar")
     profil = Profil.query.first()
+    mediciner = Medicin.query.order_by(Medicin.namn).all()
 
     nu = datetime.now()
     if intervall == "månad":
@@ -60,7 +57,6 @@ def statistik():
         gräns = nu - timedelta(days=7)
 
     intag = Intag.query.filter(Intag.tidpunkt >= gräns).all()
-
     data = defaultdict(int)
     for rad in intag:
         data[rad.namn] += 1
@@ -74,7 +70,8 @@ def statistik():
                            värden=värden,
                            intervall=intervall,
                            diagramtyp=diagramtyp,
-                           profil=profil)
+                           profil=profil,
+                           mediciner=mediciner)
 
 # 🧹 Rensa senaste intaget
 @app.route("/rensa_senaste")
@@ -89,8 +86,8 @@ def rensa_senaste():
 @app.route("/", methods=["GET", "POST"])
 def index():
     mediciner = Medicin.query.all()
-    senaste = {}
     profil = Profil.query.first()
+    senaste = {}
 
     for med in mediciner:
         senaste_intag = Intag.query.filter_by(namn=med.namn).order_by(Intag.tidpunkt.desc()).first()
@@ -104,37 +101,55 @@ def index():
         db.session.commit()
         return redirect("/")
 
-    return render_template("index.html", mediciner=mediciner, senaste=senaste, datetime=datetime, profil=profil)
+    return render_template("index.html",
+                           mediciner=mediciner,
+                           senaste=senaste,
+                           datetime=datetime,
+                           profil=profil)
 
-# ⚙️ Inställningar – namn & mediciner
+# ⚙️ Inställningar
 @app.route("/inställningar", methods=["GET", "POST"])
 def inställningar():
     mediciner = Medicin.query.order_by(Medicin.namn).all()
     profil = Profil.query.first()
 
     if request.method == "POST":
-        if "profilnamn" in request.form:
-            profil.namn = request.form.get("profilnamn") or "Användare"
+        form = request.form
+
+        if "profilnamn" in form:
+            profil.namn = form.get("profilnamn") or "Användare"
             db.session.commit()
 
-        elif "radera_id" in request.form:
-            medicin = Medicin.query.get(int(request.form["radera_id"]))
+        elif "radera_id" in form:
+            medicin = Medicin.query.get(int(form["radera_id"]))
             db.session.delete(medicin)
             db.session.commit()
 
-        elif "ändra_id" in request.form:
-            medicin = Medicin.query.get(int(request.form["ändra_id"]))
-            medicin.namn = request.form.get("namn")
-            medicin.gräns_i_timmar = int(request.form.get("gräns") or 24)
-            medicin.färgklass = request.form.get("färgklass") or "standard"
-            medicin.visa_nästa_dos = bool(request.form.get("visa_nästa_dos"))
+        elif "ändra_id" in form:
+            medicin = Medicin.query.get(int(form["ändra_id"]))
+            medicin.namn = form.get("namn")
+            medicin.färgklass = form.get("färgklass") or "standard"
+
+            if "vid_behov" in form:
+                medicin.gräns_i_timmar = 0
+                medicin.visa_nästa_dos = False
+            else:
+                medicin.gräns_i_timmar = int(form.get("gräns") or 24)
+                medicin.visa_nästa_dos = "visa_nästa_dos" in form
+
             db.session.commit()
 
         else:
-            namn = request.form.get("namn")
-            gräns = int(request.form.get("gräns") or 24)
-            färg = request.form.get("färgklass") or "standard"
-            visa_dos = bool(request.form.get("visa_nästa_dos"))
+            namn = form.get("namn")
+            färg = form.get("färgklass") or "standard"
+
+            if "vid_behov" in form:
+                gräns = 0
+                visa_dos = False
+            else:
+                gräns = int(form.get("gräns") or 24)
+                visa_dos = "visa_nästa_dos" in form
+
             if namn:
                 db.session.add(Medicin(
                     namn=namn,
@@ -146,7 +161,9 @@ def inställningar():
 
         return redirect("/inställningar")
 
-    return render_template("inställningar.html", mediciner=mediciner, profil=profil)
+    return render_template("inställningar.html",
+                           mediciner=mediciner,
+                           profil=profil)
 
 # 🚀 Kör appen
 if __name__ == "__main__":

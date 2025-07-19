@@ -7,11 +7,18 @@
 
   <form method="POST">
     {% for med in mediciner %}
-      {% if senaste[med.namn] %}
-        {% set timmar = ((datetime.now() - senaste[med.namn]).total_seconds() / 3600)|round(1) %}
-        {% set klass = med.färgklass if timmar > med.gräns_i_timmar else "" %}
+      {% set gräns = med.gräns_i_timmar %}
+      {% set senaste_tid = senaste[med.namn] if senaste[med.namn] else None %}
+
+      {% if senaste_tid %}
+        {% set timmar = ((datetime.now() - senaste_tid).total_seconds() / 3600)|round(1) %}
       {% else %}
         {% set timmar = None %}
+      {% endif %}
+
+      {% if gräns and gräns > 0 and timmar and timmar > gräns %}
+        {% set klass = med.färgklass %}
+      {% else %}
         {% set klass = "" %}
       {% endif %}
 
@@ -20,20 +27,24 @@
         <label for="{{ med.namn }}">{{ med.namn }}</label>
 
         <div class="timestamp">
-          {% if timmar is not none %}
-            {% if timmar < 1 %}
-              {% set minuter = ((datetime.now() - senaste[med.namn]).total_seconds() / 60)|round(0) %}
-              Togs för {{ minuter }} minuter sedan
-              <div class="recent-dose">Intaget nyligen</div>
-            {% else %}
-              {% set timmar_heltal = timmar|int %}
-              {% set minuter = ((timmar - timmar_heltal) * 60)|round(0) %}
-              Togs för {{ timmar_heltal }} timmar{% if minuter > 0 %} och {{ minuter }} minuter{% endif %} sedan
-            {% endif %}
+          {% if senaste_tid %}
+            {% if gräns and gräns > 0 %}
+              {% if timmar < 1 %}
+                {% set minuter = ((datetime.now() - senaste_tid).total_seconds() / 60)|round(0) %}
+                Togs för {{ minuter }} minuter sedan
+                <div class="recent-dose">Intaget nyligen</div>
+              {% else %}
+                {% set timmar_heltal = timmar|int %}
+                {% set minuter = ((timmar - timmar_heltal) * 60)|round(0) %}
+                Togs för {{ timmar_heltal }} timmar{% if minuter > 0 %} och {{ minuter }} minuter{% endif %} sedan
+              {% endif %}
 
-            {% if med.visa_nästa_dos and timmar < med.gräns_i_timmar %}
-              {% set återstår = (med.gräns_i_timmar - timmar)|round(1) %}
-              <div class="next-dose">Nästa dos om ca {{ återstår }} timmar</div>
+              {% if med.visa_nästa_dos and timmar < gräns %}
+                {% set återstår = (gräns - timmar)|round(1) %}
+                <div class="next-dose">Nästa dos om ca {{ återstår }} timmar</div>
+              {% endif %}
+            {% else %}
+              Togs senast: {{ senaste_tid.strftime("%Y-%m-%d kl. %H:%M") }}
             {% endif %}
           {% else %}
             🔴 Ej registrerat intag

@@ -24,11 +24,23 @@
   <canvas id="myChart"></canvas>
 
   <table class="stats-table">
-    <tr><th>Medicin</th><th>Antal doser under {{ intervall }}</th></tr>
+    <tr>
+      <th>Medicin</th>
+      <th>Antal doser under {{ intervall }}</th>
+      <th>Info</th>
+    </tr>
     {% for namn, antal in data.items() %}
+      {% set med = mediciner | selectattr("namn", "equalto", namn) | first %}
       <tr>
         <td>{{ namn }}</td>
         <td>{{ antal }}</td>
+        <td class="vid-behov-info">
+          {% if med and med.gräns_i_timmar == 0 %}
+            💭 Denna medicin är markerad som vid behov. Om du ser ökad användning kan du överväga att kontakta din vårdgivare.
+          {% else %}
+            &nbsp;
+          {% endif %}
+        </td>
       </tr>
     {% endfor %}
   </table>
@@ -99,4 +111,3 @@
     });
   </script>
 {% endblock %}
-
