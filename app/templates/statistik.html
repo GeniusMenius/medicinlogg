@@ -2,14 +2,17 @@
 {% block title %}📊 Statistik{% endblock %}
 
 {% block content %}
+  <!-- 🔷 Diagramrubrik beroende på valt intervall -->
   <h2>📊 Medicinintag – {{ intervall.capitalize() }}</h2>
 
+  <!-- 🔹 Välj intervalltyp -->
   <div class="stats-tabs">
     <a href="/statistik?intervall=vecka&diagramtyp={{ diagramtyp }}" class="{{ 'active' if intervall == 'vecka' else '' }}">🗓️ Vecka</a>
     <a href="/statistik?intervall=månad&diagramtyp={{ diagramtyp }}" class="{{ 'active' if intervall == 'månad' else '' }}">📅 Månad</a>
     <a href="/statistik?intervall=år&diagramtyp={{ diagramtyp }}" class="{{ 'active' if intervall == 'år' else '' }}">📆 År</a>
   </div>
 
+  <!-- 🔸 Formulär för val av diagramtyp -->
   <form method="get" class="diagram-form">
     <input type="hidden" name="intervall" value="{{ intervall }}">
     <label for="diagramtyp">Diagramtyp:</label>
@@ -21,8 +24,10 @@
     <button type="submit">Visa</button>
   </form>
 
+  <!-- 🖼️ Canvas där Chart.js ritar diagrammet -->
   <canvas id="myChart"></canvas>
 
+  <!-- 📋 Tabell med statistikdata -->
   <table class="stats-table">
     <tr>
       <th>Medicin</th>
@@ -36,7 +41,7 @@
         <td>{{ antal }}</td>
         <td class="vid-behov-info">
           {% if med and med.gräns_i_timmar == 0 %}
-            💭 Denna medicin är markerad som vid behov. Om du ser ökad användning kan du överväga att kontakta din vårdgivare.
+            💭 Vid behov. Ökad användning? Kontakta din vårdgivare.
           {% else %}
             &nbsp;
           {% endif %}
@@ -45,8 +50,16 @@
     {% endfor %}
   </table>
 
+  <!-- 📦 Ladda Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- 📈 Script för att initiera och anpassa diagrammet -->
   <script>
     const ctx = document.getElementById('myChart');
+
+    // 🔄 Kontrollera mörkt läge
+    const dark = document.body.classList.contains("dark");
+
     new Chart(ctx, {
       type: "{{ diagramtyp }}",
       data: {
@@ -58,7 +71,7 @@
             "#4caf50", "#2196f3", "#ff9800", "#f44336", "#9c27b0",
             "#00bcd4", "#8bc34a", "#ffc107", "#e91e63", "#673ab7"
           ],
-          borderColor: "#ddd",
+          borderColor: dark ? "#444" : "#ddd",
           borderWidth: 1
         }]
       },
@@ -73,19 +86,20 @@
             position: "{{ 'top' if diagramtyp != 'bar' else 'bottom' }}",
             labels: {
               font: { size: 14 },
-              color: "#333"
+              color: dark ? "#eee" : "#333"
             }
           },
           title: {
             display: true,
             text: "Antal intag – {{ intervall.capitalize() }}",
-            font: { size: 18 }
+            font: { size: 18 },
+            color: dark ? "#eee" : "#333"
           },
           tooltip: {
             enabled: true,
-            backgroundColor: "#222",
-            titleFont: { size: 14 },
-            bodyFont: { size: 13 },
+            backgroundColor: dark ? "#333" : "#222",
+            titleColor: "#fafafa",
+            bodyColor: "#eee",
             cornerRadius: 4
           }
         },
@@ -94,12 +108,20 @@
             beginAtZero: true,
             ticks: {
               precision: 0,
-              font: { size: 13 }
+              font: { size: 13 },
+              color: dark ? "#ccc" : "#333"
+            },
+            grid: {
+              color: dark ? "#555" : "#eee"
             }
           },
           x: {
             ticks: {
-              font: { size: 13 }
+              font: { size: 13 },
+              color: dark ? "#ccc" : "#333"
+            },
+            grid: {
+              color: dark ? "#444" : "#ddd"
             }
           }
         },

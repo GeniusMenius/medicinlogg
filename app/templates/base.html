@@ -1,52 +1,51 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8">
-  <title>{% block title %}Medicinschema{% endblock %}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/static/style.css">
-  <link rel="manifest" href="/static/manifest.json">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}💊 Medicinlogg{% endblock %}</title>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 </head>
 <body>
-  <!-- Navigeringslänkar och Växla-tema-knapp -->
-  <div class="links">
-    <a href="/">🏠 Start</a>
-    <a href="/logg">📒 Logg</a>
-    <a href="/statistik">📊 Statistik</a>
-    <a href="/inställningar">⚙️ Inställningar</a>
-    <button id="växla-tema" onclick="toggleDarkMode()">🌙 Växla till mörkt läge</button>
+  <!-- Main innehåll – med marginal för bottenmeny -->
+  <main style="margin-bottom: 80px;">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Fast bottennavigering -->
+  <div class="bottom-nav">
+    <a href="/" class="nav-item">🏠</a>
+    <a href="/logg" class="nav-item">📒</a>
+    <a href="/statistik" class="nav-item">📊</a>
+    <a href="/inställningar" class="nav-item">⚙️</a>
+    <button id="växla-tema" onclick="toggleDarkMode()" class="nav-item">🌙</button>
   </div>
 
-  <!-- Sidans innehåll -->
-  {% block content %}{% endblock %}
-
-  <!-- Mörkt läge–script med ready-klass -->
+  <!-- Temahantering – script som laddas efter DOM -->
   <script>
     function toggleDarkMode() {
       const isDark = document.body.classList.toggle("dark");
-      localStorage.setItem("darkMode", isDark);
+      localStorage.setItem("theme", isDark ? "dark" : "light");
 
       const knapp = document.getElementById("växla-tema");
       if (knapp) {
-        knapp.innerText = isDark
-          ? "🌞 Växla till ljust läge"
-          : "🌙 Växla till mörkt läge";
+        knapp.innerText = isDark ? "🌞" : "🌙";
       }
     }
 
-    window.addEventListener("DOMContentLoaded", () => {
-      if (localStorage.getItem("darkMode") === "true") {
+    document.addEventListener("DOMContentLoaded", () => {
+      if (localStorage.getItem("theme") === "dark") {
         document.body.classList.add("dark");
       }
-      document.body.classList.add("ready");
 
       const knapp = document.getElementById("växla-tema");
       if (knapp) {
-        knapp.innerText = document.body.classList.contains("dark")
-          ? "🌞 Växla till ljust läge"
-          : "🌙 Växla till mörkt läge";
+        knapp.innerText = document.body.classList.contains("dark") ? "🌞" : "🌙";
       }
+
+      document.body.classList.add("ready");
     });
   </script>
 </body>
