@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}🔐 Logga in{% endblock %}
+
+{% block content %}
+  <h2>🔐 Logga in</h2>
+  <form method="POST">
+    <label for="email">E-post:</label><br>
+    <input type="email" name="email" required><br>
+
+    <label for="lösenord">Lösenord:</label><br>
+    <input type="password" name="lösenord" required><br>
+
+    <button type="submit">✅ Logga in</button>
+  </form>
+  <p>Inget konto? <a href="/register">Skapa konto här</a></p>
+{% endblock %}

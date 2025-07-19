@@ -1,2 +1,4 @@
 flask
-flask_sqlalchemy
+flask-login
+flask-sqlalchemy
+werkzeug

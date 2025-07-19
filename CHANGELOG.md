@@ -1,9 +1,11 @@
-✨ UI-förbättringar & statistikfix
+✨ Fleranvändarstöd med Flask–Login + användarspecifik datamodell
 
-- Infört fast bottenmeny med ikoner och temaknapp (`base.html`, `style.css`)
-- Förbättrad temaväxling med mörkt/ljust läge som sparas i localStorage
-- Ny responsiv design för knappar med flex och media queries
-- Ny Chart.js–integration för statistikdiagram med automatisk färgjustering beroende på tema
-- Fixade preload–bugg med vit blinkning innan tema sätts (via `body.ready`)
-- Förbättrad `statistik.html`: diagramtyp–formulär, intervalltabbar, temakänslig tooltip och färger
-- All kod kommenterad med sektioner i CSS och HTML för lättare framtida underhåll
+- Lagt till användarsystem med Flask–Login (login, logout, register)
+- Skapat User–modell med lösenordshashning via Werkzeug
+- Kopplat Medicin och Intag–modeller till user_id
+- Skyddat alla vyer med @login_required
+- Uppdaterat logg, statistik och startsida för användarspecifik visning
+- Ny inställningsvy per användare (mediciner + namn)
+- Lagt till login.html och register.html i templates/
+- Rensat gamla profilmodellen
+- Säker initialisering av demo-användare

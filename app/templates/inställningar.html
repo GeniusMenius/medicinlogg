@@ -4,15 +4,17 @@
 {% block content %}
   <h2>⚙️ Medicininställningar</h2>
 
+  <!-- 👤 Visa och ändra användarnamn -->
   <h3>👤 Profilinställningar</h3>
   <form method="POST">
     <label for="profilnamn">Användarnamn:</label>
-    <input type="text" id="profilnamn" name="profilnamn" value="{{ profil.namn }}">
+    <input type="text" id="profilnamn" name="profilnamn" value="{{ profilnamn }}" required>
     <button type="submit">💾 Spara namn</button>
   </form>
   <hr>
 
-  <!-- ➕ Lägg till ny medicin -->
+  <!-- ➕ Formulär: Lägg till ny medicin -->
+  <h3>➕ Lägg till ny medicin</h3>
   <form method="POST">
     <input type="text" name="namn" placeholder="Medicinnamn" required>
     <input type="number" name="gräns" placeholder="Gräns i timmar">
@@ -34,14 +36,21 @@
     <button type="submit">➕ Lägg till</button>
   </form>
 
-  <!-- 📋 Redigera befintliga mediciner -->
-  <table>
-    <tr><th>Namn</th><th>Gräns</th><th>Färg</th><th>DOS</th><th>Vid behov</th><th>🛠</th><th>🗑</th></tr>
+  <!-- 📋 Tabell: Redigera befintliga mediciner -->
+  <h3>📋 Redigera dina mediciner</h3>
+  <table class="settings-table">
+    <thead>
+      <tr>
+        <th>Namn</th><th>Gräns</th><th>Färg</th><th>DOS</th><th>Vid behov</th><th>💾</th><th>🗑️</th>
+      </tr>
+    </thead>
+    <tbody>
     {% for med in mediciner %}
     <tr>
+      <!-- 🛠 Formulär: Uppdatera medicin -->
       <form method="POST">
         <input type="hidden" name="ändra_id" value="{{ med.id }}">
-        <td><input type="text" name="namn" value="{{ med.namn }}"></td>
+        <td><input type="text" name="namn" value="{{ med.namn }}" required></td>
         <td><input type="number" name="gräns" value="{{ med.gräns_i_timmar }}"></td>
         <td>
           <select name="färgklass">
@@ -64,15 +73,16 @@
             💤
           </label>
         </td>
-        <td><button type="submit">💾 Spara</button></td>
+        <td><button type="submit">💾</button></td>
       </form>
 
-      <!-- 🗑 Radera medicin -->
+      <!-- 🗑 Formulär: Radera medicin -->
       <form method="POST">
         <input type="hidden" name="radera_id" value="{{ med.id }}">
         <td><button type="submit" onclick="return confirm('Ta bort {{ med.namn }}?')">🗑️</button></td>
       </form>
     </tr>
     {% endfor %}
+    </tbody>
   </table>
 {% endblock %}
