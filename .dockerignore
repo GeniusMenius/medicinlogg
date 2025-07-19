@@ -1,3 +1,5 @@
-app/mediciner.db
-*.db
+app/instance/mediciner.db
 __pycache__/
+*.pyc
+*.log
+*.sqlite3

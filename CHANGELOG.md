@@ -1,32 +1,33 @@
-# 📘 Changelog – Medicinlogg
+# Changelog
 
-Alla större ändringar och förbättringar i Micha-appen dokumenteras här.
+Alla större ändringar i detta projekt dokumenteras här.
 
----
+## [Unreleased]
 
-## [v1.3.0] – 2025-07-19
+### Docker & Containerisering
+- Uppdaterad `Dockerfile` så hela `app/` kopieras, men utan att inkludera `mediciner.db`
+- Lagt till `.dockerignore` med korrekt sökväg `app/instance/mediciner.db` för att förhindra att databasen följer med i bild
+- Skapat separata volymnamn för dev och prod (`medicin_dev_data`, `medicin_prod_data`)
+- Förbättrad `docker-compose.yml` med Portainer–kompatibelt upplägg och portstyrning via `FLASK_PORT`
+- Dev–stacken körs på port `7171`, prod körs på `5000` förtillfället
+- Volym `app/instance` används för att persistera SQLite–databasen
+- Volymen rensas vid behov för att starta dev från tom databas
 
-### ✨ Nytt
-- Inför `base.html` som grundmall för alla sidor → enklare layout och färre dupliceringar
-- Visuellt mörkt/ljust läge med ikonväxling och lokal lagring via `localStorage`
-- Funktion för att markera mediciner som “💤 Vid behov”
-- Backend tolkar “Vid behov” och undviker gränsvarningar, men behåller statistik
-- “Senaste intag” visas med datum/klockslag för behovsmediciner
-- Statistik visar “💭”-notis för behovsmediciner direkt i tabellen
-- Tillägg av `Dockerfile`, `.dockerignore` och push till Docker Hub (`geniusmenius/medicinlogg:dev`)
-- README.md med appbeskrivning och installationssteg
+### Flask-applikationen
+- Ändrat `main.py` så Flask startar på port från miljövariabel: `os.environ.get("FLASK_PORT", 7000)`
+- Databasen skapas automatiskt endast om den saknas (`mediciner.db`)
+- Lagt till möjlighet att köra flera miljöer (local, dev, prod) parallellt utan portkrock
 
-### 🧼 Fix
-- HTML-fel med script-in-script i gamla `statistik.html`
-- Rensat duplicerade script från varje sida, nu i gemensam mall
+### Deployment & Git
+- Förberett pushflöde för dev–imagen till Docker Hub med tydlig taggning (`medicinlogg:dev`)
+- Genomfört manual push efter rensning av `.dockerignore` och rebuild av image
 
----
+### UI / Web (planerat)
+- Förberett flytt av knappar till undersidan via CSS `position: fixed; bottom: 0;` (ej implementerat ännu)
+- Beslut att commit skickas först innan frontend–ändringar
 
-## [v1.2.0] – Tidigare version
+## [2025-07-19] - Initial Setup
 
-### 🛠 Funktioner
-- Registrering av medicinintag via formulär
-- Spara senaste intag i databas
-- Visuell dosgräns–indikator med färgklass
-- Statistik i Chart.js
-- Inställningssida för profil och mediciner
+- Startade projektet med grundläggande Flask-app
+- Första Docker–imagen skapad
+- SQLite–databas `mediciner.db` byggs automatiskt om den saknas
