@@ -20,14 +20,6 @@ En personlig webbaserad medicinapp som hjälper dig att:
 
 ---
 
-## 🚀 Installera
-
-```bash
-git clone https://github.com/ditt-namn/medicinlogg.git
-cd medicinlogg
-docker-compose up --build
-Webbappen körs nu på http://localhost:5000 eller enligt din docker-compose.yml.
-
 🧰 Teknologi
 Flask (Python)
 
