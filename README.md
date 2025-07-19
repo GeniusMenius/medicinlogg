@@ -137,8 +137,10 @@ volumes:
 
 🚀 Kom igång
 bash
+```
 git clone https://github.com/geniusmenius/medicinlogg.git
 docker compose up -d
+```
 
 
 -----
