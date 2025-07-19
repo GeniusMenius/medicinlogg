@@ -4,6 +4,6 @@ services:
   medicinlogg:
     build: ./app
     ports:
-      - "5000:5000"
+      - "7000:7000"
     volumes:
       - ./app:/app

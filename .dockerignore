@@ -1,0 +1,3 @@
+app/mediciner.db
+*.db
+__pycache__/

@@ -1,13 +1,16 @@
-<!DOCTYPE html>
-<html lang="sv">
-<head>
-  <meta charset="UTF-8">
-  <title>Inställningar för mediciner</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/static/style.css">
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}⚙️ Inställningar{% endblock %}
+
+{% block content %}
   <h2>⚙️ Medicininställningar</h2>
+
+  <h3>👤 Profilinställningar</h3>
+  <form method="POST">
+    <label for="profilnamn">Användarnamn:</label>
+    <input type="text" id="profilnamn" name="profilnamn" value="{{ profil.namn }}">
+    <button type="submit">💾 Spara namn</button>
+  </form>
+  <hr>
 
   <form method="POST">
     <input type="text" name="namn" placeholder="Medicinnamn" required>
@@ -19,50 +22,44 @@
       <option value="blå">🔵 Blå</option>
       <option value="grön">🟢 Grön</option>
     </select>
+    <label>
+      <input type="checkbox" name="visa_nästa_dos" checked>
+      Visa nästa dosindikator
+    </label>
     <button type="submit">➕ Lägg till</button>
   </form>
 
-<table>
-  <tr><th>Namn</th><th>Gräns</th><th>Färg</th><th>🛠</th><th>🗑</th></tr>
-  {% for med in mediciner %}
-  <tr>
-    <form method="POST">
-      <input type="hidden" name="ändra_id" value="{{ med.id }}">
-      <td><input type="text" name="namn" value="{{ med.namn }}"></td>
-      <td><input type="number" name="gräns" value="{{ med.gräns_i_timmar }}"></td>
-      <td>
-        <select name="färgklass">
-          <option value="standard" {% if med.färgklass == "standard" %}selected{% endif %}>Standard</option>
-          <option value="alert" {% if med.färgklass == "alert" %}selected{% endif %}>🔴 Röd</option>
-          <option value="warning" {% if med.färgklass == "warning" %}selected{% endif %}>🟡 Gul</option>
-          <option value="blå" {% if med.färgklass == "blå" %}selected{% endif %}>🔵 Blå</option>
-          <option value="grön" {% if med.färgklass == "grön" %}selected{% endif %}>🟢 Grön</option>
-        </select>
-      </td>
-      <td><button type="submit">💾 Spara</button></td>
-    </form>
-    <form method="POST">
-      <input type="hidden" name="radera_id" value="{{ med.id }}">
-      <td><button type="submit" onclick="return confirm('Ta bort {{ med.namn }}?')">🗑️</button></td>
-    </form>
-  </tr>
-  {% endfor %}
-</table>
+  <table>
+    <tr><th>Namn</th><th>Gräns</th><th>Färg</th><th>DOS</th><th>🛠</th><th>🗑</th></tr>
+    {% for med in mediciner %}
+    <tr>
+      <form method="POST">
+        <input type="hidden" name="ändra_id" value="{{ med.id }}">
+        <td><input type="text" name="namn" value="{{ med.namn }}"></td>
+        <td><input type="number" name="gräns" value="{{ med.gräns_i_timmar }}"></td>
+        <td>
+          <select name="färgklass">
+            <option value="standard" {% if med.färgklass == "standard" %}selected{% endif %}>Standard</option>
+            <option value="alert" {% if med.färgklass == "alert" %}selected{% endif %}>🔴 Röd</option>
+            <option value="warning" {% if med.färgklass == "warning" %}selected{% endif %}>🟡 Gul</option>
+            <option value="blå" {% if med.färgklass == "blå" %}selected{% endif %}>🔵 Blå</option>
+            <option value="grön" {% if med.färgklass == "grön" %}selected{% endif %}>🟢 Grön</option>
+          </select>
+        </td>
+        <td>
+          <label>
+            <input type="checkbox" name="visa_nästa_dos" {% if med.visa_nästa_dos %}checked{% endif %}>
+            🕒
+          </label>
+        </td>
+        <td><button type="submit">💾 Spara</button></td>
+      </form>
 
-
-  <div class="links">
-    <a href="/">⬅ Tillbaka till schema</a>
-    <button onclick="toggleDarkMode()">🌓 Växla tema</button>
-  </div>
-
-  <script>
-    function toggleDarkMode() {
-      document.body.classList.toggle("dark");
-      localStorage.setItem("darkMode", document.body.classList.contains("dark"));
-    }
-    if (localStorage.getItem("darkMode") === "true") {
-      document.body.classList.add("dark");
-    }
-  </script>
-</body>
-</html>
+      <form method="POST">
+        <input type="hidden" name="radera_id" value="{{ med.id }}">
+        <td><button type="submit" onclick="return confirm('Ta bort {{ med.namn }}?')">🗑️</button></td>
+      </form>
+    </tr>
+    {% endfor %}
+  </table>
+{% endblock %}

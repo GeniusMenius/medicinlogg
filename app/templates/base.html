@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Medicinschema{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="manifest" href="/static/manifest.json">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Navigeringslänkar och Växla-tema-knapp -->
+  <div class="links">
+    <a href="/">🏠 Start</a>
+    <a href="/logg">📒 Logg</a>
+    <a href="/statistik">📊 Statistik</a>
+    <a href="/inställningar">⚙️ Inställningar</a>
+    <button id="växla-tema" onclick="toggleDarkMode()">🌙 Växla till mörkt läge</button>
+  </div>
+
+  <!-- Sidans innehåll -->
+  {% block content %}{% endblock %}
+
+  <!-- Mörkt läge–script med ready-klass -->
+  <script>
+    function toggleDarkMode() {
+      const isDark = document.body.classList.toggle("dark");
+      localStorage.setItem("darkMode", isDark);
+
+      const knapp = document.getElementById("växla-tema");
+      if (knapp) {
+        knapp.innerText = isDark
+          ? "🌞 Växla till ljust läge"
+          : "🌙 Växla till mörkt läge";
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      if (localStorage.getItem("darkMode") === "true") {
+        document.body.classList.add("dark");
+      }
+      document.body.classList.add("ready");
+
+      const knapp = document.getElementById("växla-tema");
+      if (knapp) {
+        knapp.innerText = document.body.classList.contains("dark")
+          ? "🌞 Växla till ljust läge"
+          : "🌙 Växla till mörkt läge";
+      }
+    });
+  </script>
+</body>
+</html>
