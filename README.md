@@ -113,7 +113,8 @@ Allt är kopplat till ditt eget konto – inga andra användare påverkas.
 ## 🐳 Docker–installation
 
 För att köra Medicinlogg med Docker, använd följande `docker-compose.yml`:
-
+dev har login page
+latest är utan login page, single user
 ```yaml
 version: '3.8'
 
